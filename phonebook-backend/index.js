@@ -15,13 +15,13 @@ morgan.token('host', (req, res) => {
   return req.hostname
 })
 //use host parameter for customized logging output
-//app.use(morgan(':method :host :status :res[content-length] - :response-time ms'))
+app.use(morgan(':method :host :url :status :res[content-length] - :response-time ms'))
 
 //use host parameter and token argument for customized logging output
-app.use(morgan(':method :host :url :status :param[id] :res[content-length] - :response-time ms'))
-morgan.token('param', (req, res, param) => {
-  return req.params[param]
-})
+//app.use(morgan(':method :host :url :status :param[id] :res[content-length] - :response-time ms'))
+//morgan.token('param', (req, res, param) => {
+//  return req.params[param]
+//})
 
 const persons = [
     { 
