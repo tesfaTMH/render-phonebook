@@ -7,6 +7,10 @@ app = express()
 
 app.use(express.json())
 app.use(cors())
+
+// use built-in express middleware to show static content of phonebook frontend
+app.use(express.static('dist'))
+
 //minimal logging output using predefined tiny
 //app.use(morgan('tiny'))
 
