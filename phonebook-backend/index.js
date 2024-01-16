@@ -33,6 +33,25 @@ app.use(morgan(':method :host :url :status :res[content-length] - :response-time
 //  return req.params[param]
 //})
 
+//middleware function for handling errors 
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message)
+
+  if(error.name === "CastError") {
+    return res.status(400).send({
+      error: 'malformatted id'
+    })
+  }
+
+  next(error)
+}
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({
+    error: 'unknown endpoint'
+  })
+}
+
 {/*const persons = [
     { 
       id: 1,
@@ -75,7 +94,7 @@ app.get('/info', (req, res) => {
         `)
 })
 
-app.get('/api/persons/:id', (req, res) => {
+{/*app.get('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   const person = persons.find(person => person.id === id)
   
@@ -86,19 +105,61 @@ app.get('/api/persons/:id', (req, res) => {
   }
 
 })
+*/}
 
-app.delete('/api/persons/:id', (req, res) => {
+// get by id from MongoDB 
+app.get('/api/persons/:id', (req, res, next) => {
+  Person.findById(req.params.id)
+    .then(person => {
+      if (person){
+        res.json(person)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch(error => {
+      next(error)
+    })
+})
+
+{/*app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   persons = persons.filter(person => person.id !== id)
 
   res.status(204).end()
 })
+*/}
 
-const randomId = () => {
+// delete person from MongoDB phonebook
+app.delete('/api/persons/:id', (req, res, next) => {
+  Person.findByIdAndDelete(req.params.id)
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
+})
+
+// updating person from MongoDB phonebook
+app.put('/api/persons/:id', (req, res, next) => {
+  const body = req.body
+
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
+
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatedPerson => {
+      res.json(updatedPerson)
+    })
+    .catch(error => next(error))
+})
+
+{/*const randomId = () => {
   return Math.floor(Math.random()) + persons.length
 }
 
-{/*app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res) => {
   const body = req.body
 
   const found = persons.find(person => person.name === body.name)
@@ -144,6 +205,9 @@ app.post('/api/persons', (req, res) => {
     res.json(savedPerson)
   })
 })
+
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 
