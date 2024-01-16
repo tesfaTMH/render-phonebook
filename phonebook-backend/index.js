@@ -3,10 +3,16 @@ const morgan = require('morgan')
 //middleware to use and allow for requests from all origins
 const cors = require('cors')
 
+// middleware for using enviroment variables 
+require('dotenv').config()
+
 app = express()
 
 app.use(express.json())
 app.use(cors())
+
+// module for connecting to database 
+ const Person = require('./models/person')
 
 // use built-in express middleware to show static content of phonebook frontend
 app.use(express.static('dist'))
@@ -27,7 +33,7 @@ app.use(morgan(':method :host :url :status :res[content-length] - :response-time
 //  return req.params[param]
 //})
 
-const persons = [
+{/*const persons = [
     { 
       id: 1,
       name: "Arto Hellas", 
@@ -49,9 +55,16 @@ const persons = [
       number: "39-23-6423122"
     }
 ]
-
-app.get('/api/persons', (req, res) => {
+*/}
+{/*app.get('/api/persons', (req, res) => {
   res.json(persons)
+})
+*/}
+// route for obtaining all phonebook information
+app.get('/api/persons', (req, res) => {
+  Person.find({}).then(persons => {
+    res.json(persons)
+  })
 })
 
 app.get('/info', (req, res) => {
@@ -85,7 +98,7 @@ const randomId = () => {
   return Math.floor(Math.random()) + persons.length
 }
 
-app.post('/api/persons', (req, res) => {
+{/*app.post('/api/persons', (req, res) => {
   const body = req.body
 
   const found = persons.find(person => person.name === body.name)
@@ -111,8 +124,28 @@ app.post('/api/persons', (req, res) => {
   res.json(persons)
 
 })
+*/}
 
-const PORT = process.env.PORT || 3001
+app.post('/api/persons', (req, res) => {
+  const body = req.body
+
+  if (body.name === undefined || body.number ===undefined){
+    return res.status(400).json({
+      error: 'person info missing. Check if name and phone number are defined'
+    })
+  }
+
+  const person = new Person({
+    name: body.name,
+    number: body.number,
+  })
+
+  person.save().then(savedPerson => {
+    res.json(savedPerson)
+  })
+})
+
+const PORT = process.env.PORT
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
