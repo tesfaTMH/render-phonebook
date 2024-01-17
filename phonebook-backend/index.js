@@ -199,7 +199,18 @@ app.post('/api/persons', async (req, res) => {
 
   let foundName = Person.find(query)
 
-  if(foundName){
+  const person = {
+    name: body.name,
+    number: body.number,
+  }
+
+  Person.findOneAndUpdate(query, person, { new: true, upsert: true })
+      .then(updatedPerson => {
+        res.json(updatedPerson)
+      })
+      .catch(error => next(error))
+
+  {/*if(foundName){
     const person = {
       name: body.name,
       number: body.number,
@@ -222,7 +233,7 @@ app.post('/api/persons', async (req, res) => {
         res.json(savedPerson)
         })
         .catch(error => next(error))
-    }
+    }*/}
 })
 
 app.use(unknownEndpoint)
