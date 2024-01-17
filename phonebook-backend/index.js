@@ -189,10 +189,8 @@ app.post('/api/persons', (req, res) => {
 
 app.post('/api/persons', async (req, res) => {
   const body = req.body
-  const { name, number } = req.body
   const query = { name: body.name }
-  const updateNum = { number: body.number }
-
+  
   if (body.name === undefined || body.number ===undefined){
     return res.status(400).json({
       error: 'person info missing. Check if name and phone number are defined'
@@ -213,17 +211,18 @@ app.post('/api/persons', async (req, res) => {
       })
       .catch(error => next(error))
 
-    } else{
+    } 
+    const person = new Person({
+      name: body.name,
+      number: body.number,
+    })
 
-      const person = new Person({
-        name: body.name,
-        number: body.number,
+    person.save()
+      .then(savedPerson => {
+      res.json(savedPerson)
       })
+      .catch(error => next(error))
 
-      person.save().then(savedPerson => {
-        res.json(savedPerson)
-      })
-}
 })
 
 app.use(unknownEndpoint)
