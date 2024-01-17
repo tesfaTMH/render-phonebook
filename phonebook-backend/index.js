@@ -89,7 +89,7 @@ app.get('/api/persons', (req, res) => {
 app.get('/info', (req, res) => {
   const dateToday = new Date()
   res.send(`
-            <h1>Phonebook has info for ${persons.length} persons</h1>
+            <h1>Phonebook has info for ${Person.length} persons</h1>
             <p>${dateToday}</p>
         `)
 })
@@ -189,11 +189,24 @@ app.post('/api/persons', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
   const body = req.body
+  const { name, number } = req.body
+  const query = { name: body.name }
+  const updateNum = { number: body.number }
 
   if (body.name === undefined || body.number ===undefined){
     return res.status(400).json({
       error: 'person info missing. Check if name and phone number are defined'
     })
+  }
+
+  let foundName = Person.find(query)
+
+  if(foundName){
+    Person.findOneAndUpdate(
+      query,
+      { name, number},
+      { new: true, runValidators: true, context: 'query' }
+    )
   }
 
   const person = new Person({
