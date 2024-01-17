@@ -204,8 +204,7 @@ app.post('/api/persons', (req, res) => {
   if(foundName){
     Person.findOneAndUpdate(
       query,
-      { name, number},
-      { new: true, runValidators: true, context: 'query' }
+      updateNum,
     )
   } else{
 
