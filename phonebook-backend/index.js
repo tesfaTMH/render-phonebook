@@ -197,43 +197,16 @@ app.post('/api/persons', async (req, res) => {
     })
   }
 
-  let foundName = Person.find(query)
-
   const person = {
     name: body.name,
     number: body.number,
   }
-
+  // Checks if name exist. If exists update number else create a new phoonebook entry
   Person.findOneAndUpdate(query, person, { new: true, upsert: true })
       .then(updatedPerson => {
         res.json(updatedPerson)
       })
       .catch(error => next(error))
-
-  {/*if(foundName){
-    const person = {
-      name: body.name,
-      number: body.number,
-    }
-  
-    Person.findOneAndUpdate(query, person, { new: true })
-      .then(updatedPerson => {
-        res.json(updatedPerson)
-      })
-      .catch(error => next(error))
-
-    } else{
-      const person = new Person({
-        name: body.name,
-        number: body.number,
-      })
-
-      person.save()
-        .then(savedPerson => {
-        res.json(savedPerson)
-        })
-        .catch(error => next(error))
-    }*/}
 })
 
 app.use(unknownEndpoint)
