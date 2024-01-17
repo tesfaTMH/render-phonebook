@@ -211,18 +211,18 @@ app.post('/api/persons', async (req, res) => {
       })
       .catch(error => next(error))
 
-    } 
-    const person = new Person({
-      name: body.name,
-      number: body.number,
-    })
-
-    person.save()
-      .then(savedPerson => {
-      res.json(savedPerson)
+    } else{
+      const person = new Person({
+        name: body.name,
+        number: body.number,
       })
-      .catch(error => next(error))
 
+      person.save()
+        .then(savedPerson => {
+        res.json(savedPerson)
+        })
+        .catch(error => next(error))
+    }
 })
 
 app.use(unknownEndpoint)
