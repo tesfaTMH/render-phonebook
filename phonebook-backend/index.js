@@ -202,8 +202,16 @@ app.post('/api/persons', async (req, res) => {
   let foundName = Person.find(query)
 
   if(foundName){
-      foundName.number = body.number
-      await Person.findOneAndUpdate(query, foundName, {new: true})
+    const person = {
+      name: body.name,
+      number: body.number,
+    }
+  
+    Person.findOneAndUpdate(query, person, { new: true })
+      .then(updatedPerson => {
+        res.json(updatedPerson)
+      })
+      .catch(error => next(error))
 
     } else{
 
