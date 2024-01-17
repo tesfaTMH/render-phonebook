@@ -207,16 +207,17 @@ app.post('/api/persons', (req, res) => {
       { name, number},
       { new: true, runValidators: true, context: 'query' }
     )
-  }
+  } else{
 
-  const person = new Person({
-    name: body.name,
-    number: body.number,
-  })
+    const person = new Person({
+      name: body.name,
+      number: body.number,
+    })
 
-  person.save().then(savedPerson => {
-    res.json(savedPerson)
-  })
+    person.save().then(savedPerson => {
+      res.json(savedPerson)
+    })
+}
 })
 
 app.use(unknownEndpoint)
