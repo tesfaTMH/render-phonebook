@@ -187,7 +187,7 @@ app.post('/api/persons', (req, res) => {
 })
 */}
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', async (req, res) => {
   const body = req.body
   const { name, number } = req.body
   const query = { name: body.name }
@@ -202,28 +202,19 @@ app.post('/api/persons', (req, res) => {
   let foundName = Person.find(query)
 
   if(foundName){
-    async function awaitUpdate(){
-      try{
-      const findName = await Person.findOne(
-        query
-      )
-      findName.number = body.number
-      console.log(findName.save())
-      }
-      catch (error){
-        console.error()
-      }
-    }
-  } else{
+      foundName.number = body.number
+      await Person.findOneAndUpdate(query, foundName, {new: true})
 
-    const person = new Person({
-      name: body.name,
-      number: body.number,
-    })
+    } else{
 
-    person.save().then(savedPerson => {
-      res.json(savedPerson)
-    })
+      const person = new Person({
+        name: body.name,
+        number: body.number,
+      })
+
+      person.save().then(savedPerson => {
+        res.json(savedPerson)
+      })
 }
 })
 
